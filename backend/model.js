@@ -5,7 +5,7 @@ const invoiceSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    default: "0"
+    default: "0",
   },
   date: {
     type: Date,
@@ -79,6 +79,15 @@ const invoiceSchema = new mongoose.Schema({
   },
 });
 
+const itemsSchema = new mongoose.Schema({
+  items: {
+    type: [String],
+    lowercase: true, // Ensure description is stored in lowercase
+  },
+});
+
 const Invoice = mongoose.model("Invoice", invoiceSchema);
+const Item = mongoose.model("Item", itemsSchema);
+export { Item };
 
 export default Invoice;

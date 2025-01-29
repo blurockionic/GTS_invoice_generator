@@ -1,19 +1,35 @@
 import mongoose from "mongoose";
-import Invoice from "./model.js";
-
-
-
-
+import Invoice, { Item } from "./model.js";
 
 /**
  * Create a new invoice
  * @param {Object} invoiceData - The invoice data to create
  * @returns {Object} The created invoice
- * 
- * 
+ *
+ *
  */
 export const createInvoice = async (invoiceData) => {
   try {
+    let existingItemDoc = await Item.findOne();
+
+    // Extract all existing items
+    const prevItemDescriptions = existingItemDoc
+      ? existingItemDoc.items.map((desc) => desc.toLowerCase())
+      : [];
+
+    // Filter new items that are not already stored
+    const newItems = invoiceData.items
+      .map((item) => item.description.toLowerCase())
+      .filter((desc) => !prevItemDescriptions.includes(desc));
+
+    // Save new items in the existing document
+    if (newItems.length > 0) {
+      await Item.updateOne(
+        {},
+        { $addToSet: { items: { $each: newItems } } },
+        { upsert: true }
+      );
+    }
     const newInvoice = new Invoice(invoiceData);
     await newInvoice.save();
     return newInvoice;

@@ -9,7 +9,7 @@ import {
 import mongoose from "mongoose";
 
 const router = express.Router();
-import Invoice from "./model.js";
+import Invoice, { Item } from "./model.js";
 
 // Middleware to validate MongoDB ID
 const validateId = (req, res, next) => {
@@ -31,8 +31,6 @@ router.get("/get-bill-no", async (req, res) => {
     const lastInvoice = invoices.length - 1; // Get the last invoice
     
     const nextBillNo = lastInvoice ? lastInvoice + 1 : 1; 
-
-    console.log(nextBillNo);
     // Send the next billNo as the response
     return res.json({ billNo: nextBillNo });
   } catch (error) {
@@ -109,6 +107,14 @@ router.put("/:id", [validateId], async (req, res) => {
     console.error("Error updating invoice:", error.message);
     res.status(404).json({ status: "fail", error: error.message });
   }
+});
+
+
+
+router.get("/getItems", async (req, res) => {
+
+  const data =  await Item.find()
+  res.status(200).json({ status: "success", data });
 });
 
 
